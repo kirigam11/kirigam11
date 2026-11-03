@@ -1,0 +1,33 @@
+name: Generate Snake
+
+on:
+  schedule:
+    - cron: "0 */12 * * *" # every 12 hours
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate snake SVGs
+        uses: Platane/snk/svg-only@v3
+        with:
+          github_user_name: ${{ github.repository_owner }}
+          # Cyberpunk 2077 palette: yellow snake, dark grid
+          outputs: |
+            dist/github-snake.svg?color_snake=%23FCEE0A&color_dots=%23EDEDED,%23FFE14D,%23FFC400,%23FF8A00,%23FF0055
+            dist/github-snake-dark.svg?color_snake=%23FCEE0A&color_dots=%23141421,%23443C00,%238A7A00,%23C9B800,%23FCEE0A
+
+      - name: Push to output branch
+        uses: crazy-max/ghaction-github-pages@v4
+        with:
+          target_branch: output
+          build_dir: dist
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
